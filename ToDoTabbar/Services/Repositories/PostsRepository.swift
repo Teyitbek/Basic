@@ -1,7 +1,15 @@
 import RealHTTP
 import Foundation
 
-class PostsRepository {
+/// The contract the app depends on. Tests provide their own implementation
+/// of it, so a view model can be checked without making a real network call.
+protocol PostsRepositoryProtocol {
+    func getPosts() async throws -> [Post]
+    func getPost(id: Int) async throws -> Post
+    func createPost(_ post: NewPost) async throws -> Post
+}
+
+class PostsRepository: PostsRepositoryProtocol {
     private let dataSource: PostsDataSource
     
     init(dataSource: PostsDataSource) {

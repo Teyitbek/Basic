@@ -8,7 +8,14 @@ enum DetailsSource {
     case remote(() async throws -> Details)
 }
 
-final class EndpointDetailsVM: VMProtocol {
+// `nonisolated` is required here. The target builds with
+// SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor, which makes every type
+// @MainActor and gives this class an isolated deinit. Releasing a class
+// that stores an async closure (the `.remote` case below) through that
+// isolated-deinit path crashes in the Swift runtime. The view model is
+// only ever touched from the main thread anyway, and `getDetails()` hops
+// to @MainActor explicitly before mutating state.
+nonisolated final class EndpointDetailsVM: VMProtocol {
     let title: String
     
     let successGetDetails = PassthroughSubject<Void, Never>()

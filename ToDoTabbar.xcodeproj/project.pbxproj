@@ -52,6 +52,16 @@
 			path = ToDoTabbar;
 			sourceTree = "<group>";
 		};
+		C6A1B2C42EC4767100AEBA01 /* ToDoTabbarUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ToDoTabbarUITests;
+			sourceTree = "<group>";
+		};
+		C6A1B2C32EC4767100AEBA01 /* ToDoTabbarTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ToDoTabbarTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +94,8 @@
 			isa = PBXGroup;
 			children = (
 				C690F4D12EB3191A00303B3E /* ToDoTabbar */,
+				C6A1B2C32EC4767100AEBA01 /* ToDoTabbarTests */,
+				C6A1B2C42EC4767100AEBA01 /* ToDoTabbarUITests */,
 				C690F4D02EB3191A00303B3E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -137,6 +149,9 @@
 			dependencies = (
 				C690F4E72EB3191B00303B3E /* PBXTargetDependency */,
 			);
+			fileSystemSynchronizedGroups = (
+				C6A1B2C32EC4767100AEBA01 /* ToDoTabbarTests */,
+			);
 			name = ToDoTabbarTests;
 			packageProductDependencies = (
 			);
@@ -156,6 +171,9 @@
 			);
 			dependencies = (
 				C690F4F12EB3191B00303B3E /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C6A1B2C42EC4767100AEBA01 /* ToDoTabbarUITests */,
 			);
 			name = ToDoTabbarUITests;
 			packageProductDependencies = (
@@ -468,6 +486,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
@@ -490,6 +509,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;

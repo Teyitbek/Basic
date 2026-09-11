@@ -1,10 +1,10 @@
 import UIKit
 
 struct Services {
-    let usersRepo: UsersRepository
-    let postsRepo: PostsRepository
+    let usersRepo: UsersRepositoryProtocol
+    let postsRepo: PostsRepositoryProtocol
     
-    init(usersRepo: UsersRepository, postsRepo: PostsRepository) {
+    init(usersRepo: UsersRepositoryProtocol, postsRepo: PostsRepositoryProtocol) {
         self.usersRepo = usersRepo
         self.postsRepo = postsRepo
     }
