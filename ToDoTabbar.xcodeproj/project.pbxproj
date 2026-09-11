@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C6F46ED42EC4767100AEBA01 /* RealHTTP in Frameworks */ = {isa = PBXBuildFile; productRef = C6F46ED32EC4767100AEBA01 /* RealHTTP */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		C690F4E62EB3191B00303B3E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -33,7 +37,7 @@
 		C690F4F72EB3191B00303B3E /* Exceptions for "ToDoTabbar" folder in "ToDoTabbar" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				Resources/Info.plist,
 			);
 			target = C690F4CE2EB3191A00303B3E /* ToDoTabbar */;
 		};
@@ -48,16 +52,6 @@
 			path = ToDoTabbar;
 			sourceTree = "<group>";
 		};
-		C690F4E82EB3191B00303B3E /* ToDoTabbarTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ToDoTabbarTests;
-			sourceTree = "<group>";
-		};
-		C690F4F22EB3191B00303B3E /* ToDoTabbarUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ToDoTabbarUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C6F46ED42EC4767100AEBA01 /* RealHTTP in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -89,8 +84,6 @@
 			isa = PBXGroup;
 			children = (
 				C690F4D12EB3191A00303B3E /* ToDoTabbar */,
-				C690F4E82EB3191B00303B3E /* ToDoTabbarTests */,
-				C690F4F22EB3191B00303B3E /* ToDoTabbarUITests */,
 				C690F4D02EB3191A00303B3E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -125,6 +118,7 @@
 			);
 			name = ToDoTabbar;
 			packageProductDependencies = (
+				C6F46ED32EC4767100AEBA01 /* RealHTTP */,
 			);
 			productName = ToDoTabbar;
 			productReference = C690F4CF2EB3191A00303B3E /* ToDoTabbar.app */;
@@ -142,9 +136,6 @@
 			);
 			dependencies = (
 				C690F4E72EB3191B00303B3E /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				C690F4E82EB3191B00303B3E /* ToDoTabbarTests */,
 			);
 			name = ToDoTabbarTests;
 			packageProductDependencies = (
@@ -165,9 +156,6 @@
 			);
 			dependencies = (
 				C690F4F12EB3191B00303B3E /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				C690F4F22EB3191B00303B3E /* ToDoTabbarUITests */,
 			);
 			name = ToDoTabbarUITests;
 			packageProductDependencies = (
@@ -208,6 +196,9 @@
 			);
 			mainGroup = C690F4C62EB3191A00303B3E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C6F46ED22EC4767100AEBA01 /* XCRemoteSwiftPackageReference "RealHTTP" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C690F4D02EB3191A00303B3E /* Products */;
 			projectDirPath = "";
@@ -291,12 +282,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5X46ABPB46;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ToDoTabbar/Info.plist;
+				INFOPLIST_FILE = ToDoTabbar/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -323,12 +312,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5X46ABPB46;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ToDoTabbar/Info.plist;
+				INFOPLIST_FILE = ToDoTabbar/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -591,6 +578,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C6F46ED22EC4767100AEBA01 /* XCRemoteSwiftPackageReference "RealHTTP" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/immobiliare/RealHTTP.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.9.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C6F46ED32EC4767100AEBA01 /* RealHTTP */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C6F46ED22EC4767100AEBA01 /* XCRemoteSwiftPackageReference "RealHTTP" */;
+			productName = RealHTTP;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C690F4C72EB3191A00303B3E /* Project object */;
 }
