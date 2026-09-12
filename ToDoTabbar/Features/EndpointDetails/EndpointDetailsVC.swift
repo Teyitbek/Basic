@@ -24,6 +24,11 @@ final class EndpointDetailsVC: ViewController<EndpointDetailsCV, EndpointDetails
             guard let self = self else { return }
             self.data(isLoading: false)
             self.showDetails()
+            // The screen was empty while loading, so VoiceOver has nothing
+            // useful focused. `.screenChanged` makes it announce the content
+            // that just arrived and move focus to the header.
+            UIAccessibility.post(notification: .screenChanged,
+                                 argument: self.contentView.accessibilityFocusView)
         }
         .store(in: &bag)
         
@@ -66,13 +71,33 @@ extension EndpointDetailsVC: UITableViewDelegate, UITableViewDataSource {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
         guard let row = viewModel.details?.sections[indexPath.section].rows[indexPath.row] else { return cell }
         cell.textLabel?.text = row.title
-        cell.textLabel?.font = .systemFont(ofSize: 12, weight: .regular)
+        cell.textLabel?.font = .scaled(size: 12, weight: .regular, textStyle: .caption1)
+        cell.textLabel?.adjustsFontForContentSizeCategory = true
         cell.textLabel?.textColor = .secondaryLabel
+        cell.textLabel?.numberOfLines = 0
         cell.detailTextLabel?.text = row.value
-        cell.detailTextLabel?.font = .systemFont(ofSize: 16, weight: .regular)
+        cell.detailTextLabel?.font = .scaled(size: 16, weight: .regular, textStyle: .body)
+        cell.detailTextLabel?.adjustsFontForContentSizeCategory = true
         cell.detailTextLabel?.textColor = .label
         cell.detailTextLabel?.numberOfLines = 0
         cell.selectionStyle = .none
+        configureAccessibility(of: cell, with: row)
         return cell
+    }
+
+    /// A cell built from two labels is read by VoiceOver as two separate
+    /// pieces of text. Naming the field as the *label* and the content as the
+    /// *value* instead makes it announce "Username, Bret" as one item — and a
+    /// value is re-announced on its own when it changes.
+    ///
+    /// The same row also opts in to the long-press magnifier; the interaction
+    /// that drives it lives on the content view.
+    private func configureAccessibility(of cell: UITableViewCell, with row: DetailsRow) {
+        cell.isAccessibilityElement = true
+        cell.accessibilityLabel = row.accessibilityLabel
+        cell.accessibilityValue = row.accessibilityValue
+
+        cell.showsLargeContentViewer = true
+        cell.largeContentTitle = row.largeContentTitle
     }
 }

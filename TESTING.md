@@ -281,3 +281,30 @@ default, a class storing an `async` closure gets an isolated `deinit`, and
 releasing it through that path crashes in the Swift runtime — the unit tests
 caught this. The comment above the class explains it. That is a real example of
 tests finding a crash that manual tapping did not.
+
+---
+
+## 9. Trying the accessibility features by hand
+
+Some things can only be checked with your own eyes and ears. For the details
+screen:
+
+**VoiceOver** — Settings ▸ Accessibility ▸ VoiceOver ▸ on. (On a device, triple-click
+the side button to toggle it quickly.) Swipe right to move between elements.
+The header should read as one phrase — *"Leanne Graham, leanne@example.com,
+heading"* — and each row as *"Username, Bret"*, not as two separate stops.
+
+**The long-press magnifier** (large content viewer) — it is deliberately
+invisible until the user needs it, so you must first choose an accessibility
+text size: Settings ▸ Accessibility ▸ Display & Text Size ▸ Larger Text, turn on
+*Larger Accessibility Sizes*, and drag the slider to one of the last few
+positions. Then press and hold any row on the details screen: a magnified HUD
+appears in the middle of the screen and follows your finger from row to row.
+
+On the simulator you can set the text size from the terminal instead:
+
+```bash
+xcrun simctl ui booted content_size accessibility-extra-large
+```
+
+and put it back with `content_size large`.
