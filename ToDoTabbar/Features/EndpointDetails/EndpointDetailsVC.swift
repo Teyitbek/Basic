@@ -2,6 +2,13 @@ import UIKit
 import Combine
 
 final class EndpointDetailsVC: ViewController<EndpointDetailsCV, EndpointDetailsVM> {
+
+    /// How long the skeleton stays up at minimum — one full shimmer sweep.
+    /// Without it a fast response makes the placeholder flash for a frame or
+    /// two, which reads as a glitch rather than as loading.
+    private let minimumSkeletonDuration = EndpointDetailsSkeletonView.shimmerDuration
+    private var skeletonShownAt: Date?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         title = viewModel.title
@@ -14,6 +21,16 @@ final class EndpointDetailsVC: ViewController<EndpointDetailsCV, EndpointDetails
         }
     }
     
+    /// This screen shows a skeleton of its own layout instead of the shared
+    /// spinner, so it deliberately does not call `super`.
+    override func data(isLoading: Bool) {
+        view.isUserInteractionEnabled = !isLoading
+        navigationController?.navigationBar.isUserInteractionEnabled = !isLoading
+
+        skeletonShownAt = isLoading ? Date() : nil
+        contentView.setLoading(isLoading)
+    }
+
     override func setupCV() {
         contentView.tableView.delegate = self
         contentView.tableView.dataSource = self
@@ -21,25 +38,40 @@ final class EndpointDetailsVC: ViewController<EndpointDetailsCV, EndpointDetails
     
     override func addObservers() {
         viewModel.successGetDetails.sink { [weak self] _ in
-            guard let self = self else { return }
-            self.data(isLoading: false)
-            self.showDetails()
-            // The screen was empty while loading, so VoiceOver has nothing
-            // useful focused. `.screenChanged` makes it announce the content
-            // that just arrived and move focus to the header.
-            UIAccessibility.post(notification: .screenChanged,
-                                 argument: self.contentView.accessibilityFocusView)
+            self?.afterSkeletonHasBeenSeen { [weak self] in
+                guard let self = self else { return }
+                self.data(isLoading: false)
+                self.showDetails()
+                // The screen was empty while loading, so VoiceOver has nothing
+                // useful focused. `.screenChanged` makes it announce the content
+                // that just arrived and move focus to the header.
+                UIAccessibility.post(notification: .screenChanged,
+                                     argument: self.contentView.accessibilityFocusView)
+            }
         }
         .store(in: &bag)
         
         viewModel.errorMessage.sink { [weak self] message in
-            guard let self = self else { return }
-            self.data(isLoading: false)
-            self.show(error: message)
+            self?.afterSkeletonHasBeenSeen { [weak self] in
+                guard let self = self else { return }
+                self.data(isLoading: false)
+                self.show(error: message)
+            }
         }
         .store(in: &bag)
     }
     
+    /// Runs `work` once the skeleton has been on screen for its minimum time,
+    /// or straight away if it already has (or was never shown).
+    private func afterSkeletonHasBeenSeen(_ work: @escaping () -> Void) {
+        guard let shownAt = skeletonShownAt else { return work() }
+
+        let remaining = minimumSkeletonDuration - Date().timeIntervalSince(shownAt)
+        guard remaining > 0 else { return work() }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + remaining, execute: work)
+    }
+
     private func showDetails() {
         guard let details = viewModel.details else { return }
         contentView.configure(with: details)

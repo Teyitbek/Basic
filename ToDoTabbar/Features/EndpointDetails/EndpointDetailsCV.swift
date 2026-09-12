@@ -7,8 +7,7 @@ final class EndpointDetailsCV: UIView {
     private lazy var titleLabel = makeTitleLabel()
     private lazy var subtitleLabel = makeSubtitleLabel()
     private lazy var headerStackView = makeHeaderStackView()
-
-    private let iconSize: CGFloat = 80
+    private lazy var skeletonView = EndpointDetailsSkeletonView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -21,6 +20,21 @@ final class EndpointDetailsCV: UIView {
 
     /// The element VoiceOver should land on when content appears after a load.
     var accessibilityFocusView: UIView { headerStackView }
+
+    /// Whether the loading placeholder is currently on screen.
+    var isShowingSkeleton: Bool { !skeletonView.isHidden }
+
+    /// Swaps the real content for the placeholder while loading.
+    func setLoading(_ isLoading: Bool) {
+        skeletonView.isHidden = !isLoading
+        [headerStackView, tableView].forEach { $0.isHidden = isLoading }
+
+        if isLoading {
+            skeletonView.startAnimating()
+        } else {
+            skeletonView.stopAnimating()
+        }
+    }
 
     func configure(with details: Details) {
         iconImageView.image = UIImage(systemName: details.icon)
@@ -38,10 +52,11 @@ extension EndpointDetailsCV: CVProtocol {
         backgroundColor = .systemBackground
         headerStackView.isHidden = true
 
-        [headerStackView, tableView].forEach {
+        [headerStackView, tableView, skeletonView].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             addSubview($0)
         }
+        skeletonView.isHidden = true
 
         [iconImageView, titleLabel, subtitleLabel].forEach { headerStackView.addArrangedSubview($0) }
         headerStackView.setCustomSpacing(12, after: iconImageView)
@@ -51,12 +66,17 @@ extension EndpointDetailsCV: CVProtocol {
             headerStackView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 20),
             headerStackView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -20),
 
-            iconImageView.heightAnchor.constraint(equalToConstant: iconSize),
+            iconImageView.heightAnchor.constraint(equalToConstant: 80),
 
             tableView.topAnchor.constraint(equalTo: headerStackView.bottomAnchor, constant: 16),
             tableView.leadingAnchor.constraint(equalTo: leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: bottomAnchor),
+
+            skeletonView.topAnchor.constraint(equalTo: topAnchor),
+            skeletonView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            skeletonView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            skeletonView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
 
         setupLargeContentViewer()
