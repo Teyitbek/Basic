@@ -1,95 +1,89 @@
 import XCTest
-import Combine
 @testable import ToDoTabbar
 
 // MARK: - UsersVM tests
 //
 // TESTING ASYNCHRONOUS CODE
 //
-// `getUsers()` does not finish immediately: it starts a `Task`, and only
-// later publishes on `successGetUsers`. If the test just called the method
-// and checked the result on the next line, the work would not have happened
-// yet and the test would fail for the wrong reason.
+// `load(using:)` is an `async` function: it starts, waits for the network,
+// and finishes later. A test marked `async` can simply `await` it — the test
+// pauses until the work is done, then carries on. No callbacks, no timeouts,
+// no waiting helpers.
 //
-// The fix is `XCTestExpectation`:
-//   1. create an expectation  — "something should happen"
-//   2. fulfill it in the callback — "it happened"
-//   3. `wait(for:timeout:)`   — pause the test until it does (or give up)
+// The repository is a FAKE (see MockRepositories.swift). The real one calls
+// jsonplaceholder.typicode.com, which would make this test slow, dependent on
+// Wi-Fi, and unable to check what happens when the server fails.
 
 final class UsersVMTests: XCTestCase {
-    
+
     private var repository: MockUsersRepository!
     private var sut: UsersVM!
-    /// Combine subscriptions must be kept alive, or they are cancelled
-    /// immediately and the callbacks never run.
-    private var bag: Set<AnyCancellable>!
-    
+
     override func setUp() {
         super.setUp()
         repository = MockUsersRepository()
-        sut = UsersVM(services: .mocked(users: repository))
-        bag = []
+        sut = UsersVM()
     }
-    
+
     override func tearDown() {
-        bag = nil
         sut = nil
         repository = nil
         super.tearDown()
     }
-    
+
     func test_initially_usersIsEmpty() {
-        // Nothing has been loaded yet, so the table must have no rows.
+        // Nothing has been loaded yet, so the list must have no rows.
         XCTAssertTrue(sut.users.isEmpty)
     }
-    
-    func test_getUsers_onSuccess_storesTheUsers() {
+
+    func test_load_onSuccess_storesTheUsers() async {
         // GIVEN a repository that will "return" two users
         repository.getUsersResult = .success([
             Fixtures.user(id: 1, name: "Leanne Graham"),
             Fixtures.user(id: 2, name: "Ervin Howell")
         ])
-        
-        let expectation = expectation(description: "successGetUsers is published")
-        sut.successGetUsers
-            .sink { _ in expectation.fulfill() }
-            .store(in: &bag)
-        
-        // WHEN we ask for the users
-        sut.getUsers()
-        
-        // Pause here until the expectation is fulfilled. If 1 second passes
-        // without that happening, the test fails with a timeout.
-        wait(for: [expectation], timeout: 1)
-        
-        // THEN the view model holds them, ready for the table view
+
+        // WHEN we ask for them
+        await sut.load(using: repository)
+
+        // THEN the view model holds them, ready for the list
         XCTAssertEqual(sut.users.count, 2)
         XCTAssertEqual(sut.users.first?.name, "Leanne Graham")
         XCTAssertTrue(repository.getUsersWasCalled)
     }
-    
-    func test_getUsers_onFailure_publishesAnErrorAndKeepsUsersEmpty() {
-        // GIVEN a repository that will fail.
-        // This is exactly why we use a mock: making the real network fail
-        // on demand would be impossible.
+
+    func test_load_onFailure_reportsAnErrorAndKeepsUsersEmpty() async {
+        // GIVEN a repository that will fail. This is exactly why we use a
+        // mock: making the real network fail on demand would be impossible.
         repository.getUsersResult = .failure(TestError())
-        
-        let expectation = expectation(description: "errorMessage is published")
-        var receivedMessage: String?
-        sut.errorMessage
-            .sink { message in
-                receivedMessage = message
-                expectation.fulfill()
-            }
-            .store(in: &bag)
-        
-        // WHEN we ask for the users
-        sut.getUsers()
-        
-        wait(for: [expectation], timeout: 1)
-        
-        // THEN an error was reported and no stale data was kept
-        XCTAssertNotNil(receivedMessage)
+
+        await sut.load(using: repository)
+
+        // THEN an error is available for the view and no stale data was kept
+        XCTAssertNotNil(sut.errorMessage)
         XCTAssertTrue(sut.users.isEmpty)
+    }
+
+    func test_load_whenCalledAgain_doesNotRefetch() async {
+        // SwiftUI runs `.task` again whenever the view reappears. Without a
+        // guard the list would be re-fetched every time the user navigates
+        // back to it.
+        repository.getUsersResult = .success([Fixtures.user()])
+        await sut.load(using: repository)
+
+        repository.getUsersResult = .success([Fixtures.user(), Fixtures.user()])
+        await sut.load(using: repository)
+
+        XCTAssertEqual(sut.users.count, 1)
+    }
+
+    func test_whileLoading_isLoadingIsFalseAgainAfterwards() async {
+        // The flag drives the spinner, so it must always be switched back off
+        // — including when the request fails.
+        repository.getUsersResult = .failure(TestError())
+
+        await sut.load(using: repository)
+
+        XCTAssertFalse(sut.isLoading)
     }
 }

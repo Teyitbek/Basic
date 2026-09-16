@@ -1,6 +1,6 @@
-import UIKit
+import Foundation
 
-struct User: Codable {
+struct User: Codable, Hashable {
     let id: Int
     let name: String
     let username: String
@@ -12,7 +12,7 @@ struct User: Codable {
     var avatar: String? = "person.fill"
 }
 
-struct Address: Codable {
+struct Address: Codable, Hashable {
     let street: String
     let suite: String
     let city: String
@@ -20,12 +20,12 @@ struct Address: Codable {
     let geo: Geo
 }
 
-struct Geo: Codable {
+struct Geo: Codable, Hashable {
     let lat: String
     let lng: String
 }
 
-struct Company: Codable {
+struct Company: Codable, Hashable {
     let name: String
     let catchPhrase: String
     let bs: String

@@ -1,50 +1,54 @@
 import Foundation
-import Combine
 
+/// Where a details screen gets its content.
+///
+/// The closure is held by the *view* — a struct — and only passed in to
+/// `load(from:)`, never stored on this class.
 enum DetailsSource {
-    /// Details already at hand, e.g. an entity picked from a list.
+    /// Already at hand, e.g. an entity picked from a list.
     case ready(Details)
-    /// Details that still have to be loaded from an endpoint.
+    /// Still has to be fetched from an endpoint.
     case remote(() async throws -> Details)
 }
 
-// `nonisolated` is required here. The target builds with
-// SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor, which makes every type
-// @MainActor and gives this class an isolated deinit. Releasing a class
-// that stores an async closure (the `.remote` case below) through that
-// isolated-deinit path crashes in the Swift runtime. The view model is
-// only ever touched from the main thread anyway, and `getDetails()` hops
-// to @MainActor explicitly before mutating state.
-nonisolated final class EndpointDetailsVM: VMProtocol {
-    let title: String
-    
-    let successGetDetails = PassthroughSubject<Void, Never>()
-    let errorMessage = PassthroughSubject<String, Never>()
-    
+@Observable
+final class EndpointDetailsVM {
     private(set) var details: Details?
-    private let source: DetailsSource
-    
-    init(title: String, source: DetailsSource) {
-        self.title = title
-        self.source = source
-        if case .ready(let details) = source {
+    private(set) var errorMessage: String?
+    private(set) var isLoading = false
+
+    func load(from source: DetailsSource) async {
+        switch source {
+        case .ready(let details):
+            // Nothing to wait for, so no skeleton: showing one would just
+            // flash a placeholder over content we already have.
             self.details = details
-        }
-    }
-    
-    var isReady: Bool {
-        details != nil
-    }
-    
-    func getDetails() {
-        guard case .remote(let load) = source else { return }
-        Task { @MainActor in
+
+        case .remote(let loader):
+            // `.task` re-runs on reappearance; don't refetch what we have.
+            guard details == nil, errorMessage == nil else { return }
+
+            isLoading = true
+            defer { isLoading = false }
+
+            // The fetch and the minimum skeleton time run side by side, so the
+            // placeholder is always visible for one full shimmer sweep. A fast
+            // response would otherwise flash it for a frame or two, which
+            // reads as a glitch rather than as loading.
+            async let minimumDisplay: Void = Self.minimumSkeletonDelay()
+
             do {
-                self.details = try await load()
-                successGetDetails.send(())
+                let loaded = try await loader()
+                await minimumDisplay
+                details = loaded
             } catch {
-                errorMessage.send(error.localizedDescription)
+                await minimumDisplay
+                errorMessage = error.localizedDescription
             }
         }
+    }
+
+    private static func minimumSkeletonDelay() async {
+        try? await Task.sleep(for: .seconds(SkeletonView.shimmerDuration))
     }
 }

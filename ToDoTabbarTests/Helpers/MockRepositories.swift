@@ -9,10 +9,10 @@ import Foundation
 // network. That is bad in a unit test: it is slow, it needs Wi-Fi, and it
 // can fail for reasons that have nothing to do with our code.
 //
-// Because `UsersVM` depends on the PROTOCOL `UsersRepositoryProtocol` and
-// not on the concrete class, we can hand it this fake instead. The view
-// model cannot tell the difference — and now we fully control what the
-// "network" returns, including errors.
+// Because the view models take the PROTOCOL `UsersRepositoryProtocol` and
+// not the concrete class, we can hand them this fake instead. They cannot
+// tell the difference — and now we fully control what the "network"
+// returns, including errors.
 
 final class MockUsersRepository: UsersRepositoryProtocol {
     /// What `getUsers()` should do when called.
@@ -56,10 +56,3 @@ final class MockPostsRepository: PostsRepositoryProtocol {
     }
 }
 
-extension Services {
-    /// Builds a `Services` made entirely of mocks, for convenience.
-    static func mocked(users: MockUsersRepository = MockUsersRepository(),
-                       posts: MockPostsRepository = MockPostsRepository()) -> Services {
-        Services(usersRepo: users, postsRepo: posts)
-    }
-}

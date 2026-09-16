@@ -1,29 +1,21 @@
 import Foundation
-import Combine
 
-class PostsVM: VMProtocol {
-    var onPostSelected: ((Post) -> Void)?
-    
-    let successGetPosts = PassthroughSubject<Void, Never>()
-    let errorMessage = PassthroughSubject<String, Never>()
-    
-    private let services: Services
-    
-    init(services: Services) {
-        self.services = services
-    }
-    
+@Observable
+final class PostsVM {
     private(set) var posts: [Post] = []
-    
-    func getPosts() {
-        Task { @MainActor in
-            do {
-                let response = try await services.postsRepo.getPosts()
-                self.posts = response
-                successGetPosts.send(())
-            } catch {
-                errorMessage.send(error.localizedDescription)
-            }
+    private(set) var errorMessage: String?
+    private(set) var isLoading = false
+
+    func load(using repository: PostsRepositoryProtocol) async {
+        guard posts.isEmpty, errorMessage == nil else { return }
+
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            posts = try await repository.getPosts()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 }

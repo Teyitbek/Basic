@@ -1,8 +1,7 @@
 import Foundation
 
-class HomeVM {
-    var onEndpointSelected: ((Endpoint) -> Void)?
-    
+/// A plain value: the Home tab has no state to observe, only a fixed list.
+struct HomeVM {
     let endpoints: [Endpoint] = [
         Endpoint(method: "GET", path: "/users", kind: .users),
         Endpoint(method: "GET", path: "/posts", kind: .posts),
