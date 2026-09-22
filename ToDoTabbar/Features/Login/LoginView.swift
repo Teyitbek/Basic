@@ -14,48 +14,29 @@ struct LoginView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Text("Sign In")
-                .font(.system(size: 32, weight: .bold))
-                .frame(maxWidth: .infinity)
+            signInText
 
             field(error: viewModel.nameError) {
-                TextField("Name", text: $viewModel.name)
-                    .textContentType(.name)
-                    .submitLabel(.next)
-                    .focused($focusedField, equals: .name)
-                    .onSubmit { focusedField = .email }
+                nameField
             }
             .padding(.top, 24)
 
             field(error: viewModel.emailError) {
-                TextField("Email", text: $viewModel.email)
-                    .textContentType(.emailAddress)
-                    .keyboardType(.emailAddress)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .submitLabel(.next)
-                    .focused($focusedField, equals: .email)
-                    .onSubmit { focusedField = .password }
+               emailField
             }
             .padding(.top, 16)
 
             field(error: viewModel.passwordError) {
-                SecureField("Password", text: $viewModel.password)
-                    .textContentType(.password)
-                    .submitLabel(.done)
-                    .focused($focusedField, equals: .password)
-                    .onSubmit(submit)
+                passwordField
             }
             .padding(.top, 16)
 
             Button(action: submit) {
-                Text("Login")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, minHeight: 50)
-                    .background(Color.accentColor, in: .rect(cornerRadius: 8))
+                loginButtonText
             }
             .padding(.top, 24)
+            
+            skipButton
         }
         .padding(.horizontal, 24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -69,8 +50,7 @@ struct LoginView: View {
 
     /// A text field with its error message underneath. The red border and the
     /// message appear together, so they are built in one place.
-    private func field<Content: View>(error: String?,
-                                      @ViewBuilder content: () -> Content) -> some View {
+    private func field<Content: View>(error: String?, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             content()
                 .padding(.horizontal, 12)
@@ -87,6 +67,57 @@ struct LoginView: View {
                     .foregroundStyle(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
+        }
+    }
+    
+    var signInText: some View {
+        Text("Sign In")
+            .font(.system(size: 32, weight: .bold))
+            .frame(maxWidth: .infinity)
+    }
+    
+    var nameField: some View {
+        TextField("Name", text: $viewModel.name)
+            .textContentType(.name)
+            .submitLabel(.next)
+            .focused($focusedField, equals: .name)
+            .onSubmit { focusedField = .email }
+    }
+    
+    var emailField: some View {
+        TextField("Email", text: $viewModel.email)
+            .textContentType(.emailAddress)
+            .keyboardType(.emailAddress)
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
+            .submitLabel(.next)
+            .focused($focusedField, equals: .email)
+            .onSubmit { focusedField = .password }
+    }
+    
+    var passwordField: some View {
+        SecureField("Password", text: $viewModel.password)
+            .textContentType(.password)
+            .submitLabel(.done)
+            .focused($focusedField, equals: .password)
+            .onSubmit(submit)
+    }
+    
+    var loginButtonText: some View {
+        Text("Login")
+            .font(.system(size: 17, weight: .semibold))
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity, minHeight: 50)
+            .background(Color.accentColor, in: .rect(cornerRadius: 8))
+    }
+    
+    var skipButton: some View {
+        NavigationLink(destination: HomeView()) {
+            Text("Skip")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(.primary)
+                .frame(maxWidth: .infinity, minHeight: 50)
+                .background(Color.clear, in: .rect(cornerRadius: 8))
         }
     }
 
