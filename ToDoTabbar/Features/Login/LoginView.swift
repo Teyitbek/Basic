@@ -112,7 +112,7 @@ struct LoginView: View {
     }
     
     var skipButton: some View {
-        NavigationLink(destination: HomeView()) {
+        NavigationLink(destination: TabbarView()) {
             Text("Skip")
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(.primary)
