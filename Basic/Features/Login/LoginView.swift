@@ -111,8 +111,15 @@ struct LoginView: View {
             .background(Color.accentColor, in: .rect(cornerRadius: 8))
     }
     
+    /// Skipping enters the app exactly the way a successful login does: it
+    /// reports back so the tab bar becomes the stack's ROOT.
+    ///
+    /// It must not be a `NavigationLink(destination:)`. That pushes the tab
+    /// bar onto this stack, and a `navigationDestination(for:)` declared
+    /// inside a view pushed that way is never registered — which silently
+    /// breaks every link on the Home screen.
     var skipButton: some View {
-        NavigationLink(destination: TabbarView()) {
+        Button(action: onLoginSuccess) {
             Text("Skip")
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(.primary)

@@ -92,4 +92,39 @@ final class EndpointDetailsVMTests: XCTestCase {
 
         XCTAssertFalse(sut.isLoading)
     }
+
+    // MARK: - Empty and error states
+
+    func test_afterLoadingNothing_theScreenIsEmpty() async {
+        // An endpoint can answer with no sections to show. The screen must
+        // say so rather than render a blank rectangle.
+        await sut.load(from: .remote {
+            Details(icon: "tray", title: "", subtitle: "", sections: [])
+        })
+
+        XCTAssertTrue(sut.isEmpty)
+    }
+
+    func test_afterLoadingContent_theScreenIsNotEmpty() async {
+        await sut.load(from: .ready(Fixtures.post().details))
+
+        XCTAssertFalse(sut.isEmpty)
+    }
+
+    func test_onFailure_theAlertIsShown() async {
+        await sut.load(from: .remote { throw TestError() })
+
+        XCTAssertTrue(sut.isShowingError)
+    }
+
+    func test_dismissingTheAlert_clearsTheError() async {
+        // The alert is bound to this flag, so turning it off has to clear the
+        // message — otherwise the alert reappears immediately.
+        await sut.load(from: .remote { throw TestError() })
+
+        sut.isShowingError = false
+
+        XCTAssertNil(sut.errorMessage)
+        XCTAssertFalse(sut.isShowingError)
+    }
 }

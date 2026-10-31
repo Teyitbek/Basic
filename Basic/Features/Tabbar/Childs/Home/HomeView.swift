@@ -7,16 +7,18 @@ struct HomeView: View {
 
     var body: some View {
         List(viewModel.endpoints, id: \.self) { endpoint in
-            // The row IS the navigation: tapping pushes the value, and the
-            // destination below decides what to build from it.
             NavigationLink(value: endpoint) {
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(endpoint.listTitle)
-                        .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                        .font(.system(.subheadline, design: .monospaced, weight: .semibold))
+                        .lineLimit(nil)
+                    
                     Text(endpoint.url)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+                        .lineLimit(nil)
                 }
+                .fixedSize(horizontal: false, vertical: true)
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel(endpoint.title)
             }
@@ -26,8 +28,6 @@ struct HomeView: View {
         .navigationDestination(for: Endpoint.self, destination: destination)
     }
 
-    /// One place that maps an endpoint to the screen it opens. This is the
-    /// job the coordinator used to do, now sitting next to the list itself.
     @ViewBuilder
     private func destination(for endpoint: Endpoint) -> some View {
         switch endpoint.kind {

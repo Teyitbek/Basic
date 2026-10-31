@@ -7,17 +7,19 @@ struct EndpointDetailsView: View {
     /// default isolation, and releasing one crashes in the Swift runtime.
     let source: DetailsSource
 
-    @Environment(\.dismiss) private var dismiss
     @State private var viewModel = EndpointDetailsVM()
 
     var body: some View {
         Group {
-            if let details = viewModel.details {
-                content(for: details)
-            } else if viewModel.isLoading {
+            if viewModel.isLoading {
                 SkeletonView()
+            } else if let details = viewModel.details, !details.sections.isEmpty {
+                content(for: details)
             } else {
-                Color(.systemBackground)
+                // Nothing came back. The alert explains why when there was an
+                // error; this stays behind it either way, so the screen is
+                // never just a blank rectangle.
+                emptyState
             }
         }
         .navigationTitle(title)
@@ -25,18 +27,24 @@ struct EndpointDetailsView: View {
         .task {
             await viewModel.load(from: source)
         }
-        .alert("Something went wrong",
-               isPresented: .constant(viewModel.errorMessage != nil)) {
-            Button("OK") { dismiss() }
+        .alert("Something went wrong", isPresented: $viewModel.isShowingError) {
+            Button("OK", role: .cancel) {}
         } message: {
             Text(viewModel.errorMessage ?? "")
         }
     }
 
+    private var emptyState: some View {
+        ContentUnavailableView("No Data",
+                               systemImage: "tray",
+                               description: Text("This endpoint returned nothing to show."))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(.systemBackground))
+    }
+
     private func content(for details: Details) -> some View {
         VStack(spacing: 16) {
             header(for: details)
-
             List {
                 ForEach(details.sections, id: \.self) { section in
                     Section(section.title) {

@@ -17,6 +17,18 @@ final class EndpointDetailsVM {
     private(set) var errorMessage: String?
     private(set) var isLoading = false
 
+    /// Drives the alert. Writable so dismissing it clears the message —
+    /// an alert bound to a constant can never be closed by the system.
+    var isShowingError: Bool {
+        get { errorMessage != nil }
+        set { if !newValue { errorMessage = nil } }
+    }
+
+    /// True once loading has finished with nothing to show.
+    var isEmpty: Bool {
+        !isLoading && (details?.sections.isEmpty ?? true)
+    }
+
     func load(from source: DetailsSource) async {
         switch source {
         case .ready(let details):
