@@ -3,6 +3,12 @@ import SwiftUI
 struct TabbarView: View {
     @State private var selectedIndex = 0
 
+    // MARK: - iPhone Duo
+    //
+    // Everything from here to `selectedTab` exists only so a wide screen gets
+    // the side rail. The standard mode is the `false` arm of `usesSideRail`:
+    // a plain VStack with the bar across the bottom.
+
     /// Above this width-to-height ratio the screen is wide enough that a bar
     /// across the bottom wastes space, and a rail down the trailing edge
     /// reads better.
